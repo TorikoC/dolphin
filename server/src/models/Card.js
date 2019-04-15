@@ -6,6 +6,12 @@ const CardSchema = mongoose.Schema({
   back: {
     type: String,
   },
+  counter: {
+    appear: 0,
+    remember: 0,
+    forget: 0,
+  },
+  score: 0
 });
 
 const Card = mongoose.model('Card', CardSchema);

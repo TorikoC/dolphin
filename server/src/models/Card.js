@@ -7,9 +7,12 @@ const CardSchema = mongoose.Schema({
     type: String,
   },
   counter: {
-    appear: 0,
-    remember: 0,
-    forget: 0,
+    type: Object,
+    default: {
+      appear: 0,
+      remember: 0,
+      forget: 0,
+    },
   },
 });
 

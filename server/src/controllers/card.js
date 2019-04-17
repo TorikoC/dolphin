@@ -40,7 +40,6 @@ async function updateCard(req, res) {
   keys.forEach(k => {
     update.$set[k] = req.body[k];
   });
-  console.log(update);
   db.Card.findByIdAndUpdate(id, update).exec();
   res.send('0k');
 }

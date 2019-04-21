@@ -42,7 +42,6 @@ async function updateCard(req, res) {
 async function deleteCard(req, res) {
   let { deckId, cardId } = req.params;
   let deck = await db.Deck.findById(deckId);
-  console.log(deckId, cardId, deck);
   let card = deck.cards.id(cardId);
   await card.remove();
   await deck.save();
@@ -50,7 +49,23 @@ async function deleteCard(req, res) {
 }
 
 async function getDecks(req, res) {
-  let decks = await db.Deck.find();
+  let decks = await db.Deck.find({ parent: null }).lean();
+  async function find(d) {
+    if (d.children && d.children.length > 0) {
+      let list = [];
+      for (let c of d.children) {
+        let result = await db.Deck.findById(c).lean();
+        list.push(result);
+      }
+      d.children = list;
+      for (let c of d.children) {
+        await find(c);
+      }
+    }
+  }
+  for (let d of decks) {
+    await find(d);
+  }
   res.send(decks);
 }
 
@@ -63,6 +78,11 @@ async function updateDeck(req, res) {
 
 async function createDeck(req, res) {
   let deck = new db.Deck(req.body);
+  if (deck.parent) {
+    let parentDeck = await db.Deck.findById(deck.parent);
+    parentDeck.children.push(deck._id);
+    await parentDeck.save();
+  }
   let result = await deck.save();
   res.send(result);
 }

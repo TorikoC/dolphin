@@ -17,6 +17,29 @@ async function getCards(req, res) {
   res.send(cards);
 }
 
+async function getRandomCards(req, res) {
+  let { id } = req.params;
+  let cards = [];
+  async function findDeck(id) {
+    let deck = await db.Deck.findById(id);
+    cards = cards.concat(deck.cards);
+    if (deck.children.length < 1) {
+      return;
+    }
+    deck.children.forEach(d => {
+      findDeck(d._id);
+    });
+  }
+  await findDeck(id);
+  let len = cards.length;
+  if (len < 10) {
+    res.send(cards);
+  } else {
+    let ran = Math.random() * (len - 10);
+    res.send(cards.slice(ran, ran + 10));
+  }
+}
+
 async function createCard(req, res) {
   let { id } = req.params;
   let card = new db.Card(req.body);
@@ -98,7 +121,7 @@ module.exports = {
   createDeck,
   updateDeck,
   deleteDeck,
-
+  getRandomCards,
   getCards,
   createCard,
   updateCard,

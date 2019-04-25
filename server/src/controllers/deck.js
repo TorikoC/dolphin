@@ -42,7 +42,7 @@ async function getRandomCards(req, res) {
 
 async function createCard(req, res) {
   let { id } = req.params;
-  let card = new db.Card(req.body);
+  let card = req.body;
   let deck = await db.Deck.findById(id);
   deck.cards.push(card);
   await deck.save();
@@ -57,6 +57,9 @@ async function updateCard(req, res) {
       $set: {
         'cards.$': body,
       },
+    },
+    {
+      new: true,
     },
   );
   res.send(deck);

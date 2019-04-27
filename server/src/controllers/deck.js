@@ -31,6 +31,7 @@ async function getRandomCards(req, res) {
     });
   }
   await findDeck(id);
+  cards.sort((c1, c2) => c1.score - c2.score);
   let len = cards.length;
   if (len < 10) {
     res.send(cards);
@@ -51,6 +52,7 @@ async function createCard(req, res) {
 async function updateCard(req, res) {
   let { deckId, cardId } = req.params;
   let { body } = req;
+  console.log(body);
   let deck = await db.Deck.findOneAndUpdate(
     { _id: deckId, 'cards._id': cardId },
     {

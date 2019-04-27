@@ -6,14 +6,7 @@ const CardSchema = mongoose.Schema({
   back: {
     type: String,
   },
-  counter: {
-    type: Object,
-    default: {
-      appear: 0,
-      remember: 0,
-      forget: 0,
-    },
-  },
+  score: { type: Number, default: 0 },
 });
 
 const DeckSchema = mongoose.Schema({

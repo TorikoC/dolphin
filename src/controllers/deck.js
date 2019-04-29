@@ -2,6 +2,9 @@ const db = require('../models');
 
 async function getCards(req, res) {
   let { id } = req.params;
+  let { page } = req.query;
+  page = +page || 1;
+  let pageSize = 10;
   let cards = [];
   async function findDeck(id) {
     let deck = await db.Deck.findById(id);
@@ -14,7 +17,13 @@ async function getCards(req, res) {
     });
   }
   await findDeck(id);
-  res.send(cards);
+  res.send({
+    list: cards.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize),
+    total:
+      cards.length % pageSize === 0
+        ? cards.length / pageSize
+        : Math.ceil(cards.length / pageSize),
+  });
 }
 
 async function getRandomCards(req, res) {

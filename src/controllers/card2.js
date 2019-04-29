@@ -1,7 +1,7 @@
 let Card = require('../models/Card2');
 
 async function getCards(req, res) {
-  let { page, pageSize, tags } = req.query;
+  let { page, pageSize, tags, sort } = req.query;
 
   let cond = {};
   if (tags) {
@@ -19,6 +19,12 @@ async function getCards(req, res) {
     .skip(skip)
     .limit(pageSize);
   let p2 = Card.find(cond).count();
+  if (sort) {
+    let [field, key] = sort.split('|');
+    let sortCond = {};
+    sortCond[field] = key.toLowerCase() === 'desc' ? -1 : 1;
+    p1.sort(sortCond);
+  }
 
   let results = await Promise.all([p1, p2]);
   let cards = results[0];

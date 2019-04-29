@@ -1,16 +1,24 @@
 let Card = require('../models/Card2');
 
 async function getCards(req, res) {
-  let { page, pageSize } = req.query;
+  let { page, pageSize, tags } = req.query;
 
+  let cond = {};
+  if (tags) {
+    tags = tags.split(',');
+    cond.tags = {
+      $in: tags,
+    };
+  }
   page = +page || 1;
-  pageSize = +pageSize || 1;
+  pageSize = +pageSize || 10;
+
   let skip = (page - 1) * pageSize;
 
-  let p1 = Card.find()
+  let p1 = Card.find(cond)
     .skip(skip)
     .limit(pageSize);
-  let p2 = Card.find().count();
+  let p2 = Card.find(cond).count();
 
   let results = await Promise.all([p1, p2]);
   let cards = results[0];

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const deckCtrl = require('./deck');
 const cardCtrl = require('./card2');
+const tagCtrl = require('./tag');
 
 router.get('/decks', deckCtrl.getDecks);
 router.post('/decks', deckCtrl.createDeck);
@@ -18,5 +19,10 @@ router.get('/v2/random-cards', cardCtrl.getRandomCards);
 router.post('/v2/cards', cardCtrl.createCard);
 router.put('/v2/cards/:id', cardCtrl.updateCard);
 router.delete('/v2/cards/:id', cardCtrl.deleteCard);
+
+router.get('/v2/tags', tagCtrl.getTags);
+router.post('/v2/tags', tagCtrl.createTag);
+router.put('/v2/tags/:id', tagCtrl.updateTag);
+router.delete('/v2/tags/:id', tagCtrl.deleteTag);
 
 module.exports = router;

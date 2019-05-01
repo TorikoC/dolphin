@@ -3,7 +3,10 @@ let mongoose = require('mongoose');
 let CardSchema = mongoose.Schema({
   front: String,
   back: String,
-  tags: [mongoose.SchemaTypes.ObjectId],
+  tags: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Tag'
+  }],
   score: {
     type: Number,
     default: 0,

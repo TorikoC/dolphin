@@ -10,6 +10,7 @@ const controllers = require('./controllers');
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'dist')));
+app.use('/docs', express.static(path.join(__dirname, 'docs')))
 
 app.use(cors());
 app.use(bodyParser.json());

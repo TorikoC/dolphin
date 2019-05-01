@@ -1,6 +1,10 @@
 let Card = require('../models/Card2');
+let redis = require('redis').createClient({
+  prot: 6379
+})
 
 async function getCards(req, res) {
+
   let { page, pageSize, tags, sort, poll } = req.query;
 
   let cond = {};
@@ -11,10 +15,9 @@ async function getCards(req, res) {
     };
   }
   page = +page || 1;
-  pageSize = +pageSize || 10;
+  pageSize = +pageSize || 20;
 
   let skip = (page - 1) * pageSize;
-
   let p1 = Card.find(cond)
     .skip(skip)
     .limit(pageSize);
@@ -35,10 +38,13 @@ async function getCards(req, res) {
   total =
     total % pageSize === 0 ? total / pageSize : Math.ceil(total / pageSize);
 
-  res.send({
+  let result = {
     list: cards,
     total: total,
-  });
+  }
+  let key = `cards:${tags ? tags.join(',') : 'a'}:${poll ? 1 : 0}:${page}`;
+  redis.set(key, JSON.stringify(result));
+  res.send(result);
 }
 
 async function getRandomCards(req, res) {
@@ -63,6 +69,7 @@ async function getRandomCards(req, res) {
 async function createCard(req, res) {
   let card = new Card(req.body);
   await card.save();
+  cleanCache();
   res.send(card);
 }
 
@@ -70,13 +77,29 @@ async function updateCard(req, res) {
   let { id } = req.params;
   let { body } = req;
   let newCard = await Card.findOneAndUpdate({ _id: id }, body, { new: true });
+  cleanCache();
   res.send(newCard);
 }
 
 async function deleteCard(req, res) {
   let { id } = req.params;
   let result = await Card.findByIdAndDelete(id);
+  cleanCache();
   res.send(result);
+}
+
+function cleanCache() {
+  redis.keys('cards*', (err, reply) => {
+    if (err) {
+      return;
+    }
+    if (!reply || !(reply instanceof Array)) {
+      return;
+    }
+    reply.forEach((key) => {
+      redis.del(key)
+    })
+  })
 }
 
 module.exports = {

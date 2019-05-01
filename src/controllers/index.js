@@ -2,6 +2,7 @@ const router = require('express').Router();
 const deckCtrl = require('./deck');
 const cardCtrl = require('./card2');
 const tagCtrl = require('./tag');
+const cacheCtrl = require('./cache')
 
 router.get('/decks', deckCtrl.getDecks);
 router.post('/decks', deckCtrl.createDeck);
@@ -14,7 +15,7 @@ router.post('/decks/:id/cards', deckCtrl.createCard);
 router.put('/decks/:deckId/cards/:cardId', deckCtrl.updateCard);
 router.delete('/decks/:deckId/cards/:cardId', deckCtrl.deleteCard);
 
-router.get('/v2/cards', cardCtrl.getCards);
+router.get('/v2/cards', cacheCtrl.getCards, cardCtrl.getCards);
 router.get('/v2/random-cards', cardCtrl.getRandomCards);
 router.post('/v2/cards', cardCtrl.createCard);
 router.put('/v2/cards/:id', cardCtrl.updateCard);

@@ -1,4 +1,5 @@
 let Tag = require('../models/Tag');
+let Card = require('../models/Card2');
 
 async function getTags(req, res) {
   let tags = await Tag.find();
@@ -18,6 +19,11 @@ async function updateTag(req, res) {
 async function deleteTag(req, res) {
   let { id } = req.params;
   let result = await Tag.findByIdAndRemove(id);
+  await Card.updateMany({}, {
+    $pull: {
+      tags: id
+    }
+  });
   res.send(result);
 }
 module.exports = {
